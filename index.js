@@ -373,6 +373,33 @@ async function connectToWhatsApp() {
             // Prepare prompt (remove prefix if present, but for whitelisted chats keep natural flow)
             const userPrompt = textMessage.replace(/^!mike/i, '').trim();
 
+            // --- SPECIAL COMMANDS ---
+            // Shutdown Logic: Allows user to kill the bot remotely
+            if (userPrompt.toLowerCase() === 'shutdown' || userPrompt.toLowerCase() === 'apagate') {
+                console.log(`[CMD] Shutdown requested by ${sender}`);
+                // Use a try-catch for the message sending to ensure process exits even if sending fails
+                try {
+                    await sock.sendMessage(sender, { text: "🔌 **Desconectando...**\nApagando sistema Antigravity Bridge. Necesitarás reiniciar el servicio manualmente para volver a usarme. ¡Hasta luego! 👋" });
+                } catch (e) {
+                    console.error("Failed to send shutdown ack:", e);
+                }
+
+                // Allow message to send before killing process
+                setTimeout(() => {
+                    // Unload the Launch Agent to prevent auto-restart
+                    require('child_process').exec('launchctl unload ~/Library/LaunchAgents/com.antigravity.mike.plist', (err, stdout, stderr) => {
+                        if (err) {
+                            console.error("Failed to unload plist:", err);
+                            // If unload fails, we still exit. It might restart, but we tried.
+                            process.exit(1);
+                        }
+                        console.log("Service unloaded successfully.");
+                        process.exit(0);
+                    });
+                }, 2000);
+                continue;
+            }
+
             try {
                 // Indicate "typing" or "recording"
                 await sock.sendPresenceUpdate(audioMessage ? 'recording' : 'composing', sender);

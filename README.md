@@ -1,3 +1,4 @@
+![Antigravity Mike Banner](mike_banner.jpg)
 # Antigravity Bridge (Project Mike) 🚀🍌
 
 **Your Desktop, controlled from WhatsApp.**
