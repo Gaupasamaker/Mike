@@ -342,24 +342,36 @@ async function connectToWhatsApp() {
 
             console.log(`Msg from ${sender} (Me: ${isFromMe}) ID: ${msg.key.id} Type: ${imageMessage ? 'IMAGE' : audioMessage ? 'AUDIO' : 'TEXT'}`);
 
-            // Filter:
+            // Security Filter:
             // 1. MUST NOT be a status update (broadcast)
             if (sender === 'status@broadcast') continue;
 
-            // 2. Logic:
-            //    - If !ai detected -> Always process
-            //    - If it's a DM (not group) -> Always process (Natural conversation)
-            //    - If Group -> NOW ALWAYS PROCESS (User requested it for dedicated room)
+            // 2. Load Whitelist
+            const allowedJids = process.env.ALLOWED_JIDS ? process.env.ALLOWED_JIDS.split(',').map(id => id.trim()) : [];
+            const isWhitelisted = allowedJids.includes(sender);
 
-            // OLD LOGIC: const isGroup = sender.endsWith('@g.us');
-            // OLD LOGIC: const hasPrefix = textMessage.toLowerCase().startsWith('!ai');
-            // OLD LOGIC: if (isGroup && !hasPrefix) continue;
+            // LOGGING FOR SETUP
+            const chatName = msg.pushName || "Unknown";
+            console.log(`[SETUP_AID] Contact: "${chatName}" | JID: "${sender}"`);
 
-            // Skip empty text messages if no media
-            if (!textMessage && !imageMessage && !audioMessage) continue;
+            // 3. Strict Logic
+            // If Whitelist is ACTIVE (has entries), ignore everything else.
+            if (allowedJids.length > 0) {
+                if (!isWhitelisted) {
+                    console.log(`[BLOCKED] Sender ${sender} is NOT in the whitelist.`);
+                    continue;
+                }
+            } else {
+                // If Whitelist is EMPTY, fallback to Prefix protection to prevent leaks
+                const hasPrefix = textMessage.trim().toLowerCase().startsWith('!mike');
+                if (!hasPrefix) {
+                    console.log(`[IGNORED] No whitelist set & no prefix.`);
+                    continue;
+                }
+            }
 
-            // Prepare prompt (remove prefix if strictly used, optional now)
-            const userPrompt = textMessage.replace(/^!ai/i, '').trim();
+            // Prepare prompt (remove prefix if present, but for whitelisted chats keep natural flow)
+            const userPrompt = textMessage.replace(/^!mike/i, '').trim();
 
             try {
                 // Indicate "typing" or "recording"
@@ -456,9 +468,9 @@ This contains multiple projects. Use \`search_files\` to find things efficiently
 
 **Guidelines:**
 - **path 'Antigravity' or 'Root'** = \`../../\`.
-- **ALWAYS** use \`list_files\` or \`search_files\` first.
-- If asked to **draw**, **paint**, or **generate an image**, command the \`generate_image\` tool immediately. DO NOT REFUSE.
-- **ALWAYS** reply in Spanish.
+// - If asked to **draw**, **paint**, or **generate an image**, command the \`generate_image\` tool immediately. DO NOT REFUSE.
+// - **ALWAYS** reply in Spanish.
+// - **User Trigger**: I only see messages starting with \`!mike\` OR any message in my allowed chats. Treat them as direct instructions.
                                 ` }],
                             },
                             {

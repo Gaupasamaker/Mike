@@ -39,6 +39,12 @@ This bot has **filesystem and terminal access**. While it includes safety guardr
     GEMINI_API_KEY=your_api_key_here
     # Optional: Override the root directory the bot can access (defaults to parent folder)
     # PROJECT_ROOT=/Users/me/my-projects
+    
+    # 🔒 Privacy Whitelist (Recommended)
+    # Comma-separated list of WhatsApp JIDs allowed to talk to Mike.
+    # If set, Mike will IGNORE everyone else.
+    # To find your JID, run the bot and send a message. The log will show: [SETUP_AID] JID: "1234..."
+    # ALLOWED_JIDS=123456789@s.whatsapp.net
     ```
 
 4.  **Run it:**
@@ -54,6 +60,19 @@ This bot has **filesystem and terminal access**. While it includes safety guardr
 6.  **Start Chatting!**
     - Say "Hola Mike!"
     - Try: *"Créame un archivo hello.txt"* or *"Dibújame un programador en el espacio"*.
+
+## 🛡️ Privacy & Security Modes
+Mike has two modes of operation for privacy:
+
+1.  **Strict Mode (Default if `ALLOWED_JIDS` is set)**:
+    - Only responds to numbers in `ALLOWED_JIDS`.
+    - Ignores everyone else completely.
+    - No prefix needed for whitelisted users (Natural conversation).
+
+2.  **Public/Open Mode (If `ALLOWED_JIDS` is empty)**:
+    - Responds to ANYONE who sends a message starting with `!mike`.
+    - Ignores messages without the prefix.
+    - Useful if you want to share the bot in a group but control when it speaks.
 
 ## Project Structure
 - `index.js`: The brain. Contains the connection logic, tool definitions, and Gemini loop.
