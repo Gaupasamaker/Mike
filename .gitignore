@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Secrets
+.env
+
+# Session Data & Auth
+baileys_auth_info/
+artifacts/sessions.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# System
+.DS_Store
