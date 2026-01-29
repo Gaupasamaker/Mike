@@ -60,6 +60,7 @@ This bot has **filesystem and terminal access**. While it includes safety guardr
 6.  **Start Chatting!**
     - Say "Hola Mike!"
     - Try: *"Créame un archivo hello.txt"* or *"Dibújame un programador en el espacio"*.
+    - **Stop Bot:** `!mike shutdown` (Este comando apaga el servicio completamente).
 
 ## 🛡️ Privacy & Security Modes
 Mike has two modes of operation for privacy:
